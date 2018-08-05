@@ -19,4 +19,34 @@ Type = root.findall('.//xn:vsDataType', ns)
 typeArray = []
 for name in Type:
     typeArray.append(name.text)
-print(len(set(typeArray)))
+nameOfObj = list(set(typeArray))
+#print(len(nameOfObj))
+print(Type[0].text)
+#pa = Type[10].find("..")
+#print(root.find('.//nons:configData', ns).tag)
+"""
+pa = root.find('.//%s/..' % Type[0].tag)
+pb = root.find('.//%s/..' % Type[1].tag)
+print(pa.tag == pb.tag)"""
+
+def CreateMO(xmlfile, elementObject):
+    
+    arrayOfParent = []
+    
+    parent = root.find('.//%s/../..' % elementObject.tag)
+   # print(currentAtrrib.tag)
+   # parent = root.find('.//%s/..' % currentAtrrib.tag)
+    print(parent.tag)
+    while parent.tag != root.find('.//nons:configData', ns).tag:
+        if parent.tag == root.find('.//xn:VsDataContainer', ns).tag:
+            attribOfparent = parent.find('./xn:attributes/xn:vsDataType', ns)
+            arrayOfParent.append(attribOfparent.text.split('vsData')[-1] + "=" + parent.get('id'))
+        else:
+            arrayOfParent.append(parent.tag + "=" + parent.get('id'))
+        parent = root.find('.//%s/..' % parent.tag)
+    
+    #arrayOfParent = arrayOfParent[::-1]
+    return ",".join(arrayOfParent)
+
+a = CreateMO(xmlfile, Type[0])
+print(a)
