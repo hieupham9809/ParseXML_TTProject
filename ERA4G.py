@@ -21,32 +21,33 @@ for name in Type:
     typeArray.append(name.text)
 nameOfObj = list(set(typeArray))
 #print(len(nameOfObj))
-print(Type[0].text)
-#pa = Type[10].find("..")
-#print(root.find('.//nons:configData', ns).tag)
-"""
-pa = root.find('.//%s/..' % Type[0].tag)
-pb = root.find('.//%s/..' % Type[1].tag)
-print(pa.tag == pb.tag)"""
+print(Type[100].text)
 
+
+parent_map = dict((c, p) for p in root.getiterator() for c in p)
 def CreateMO(xmlfile, elementObject):
     
     arrayOfParent = []
     
-    parent = root.find('.//%s/../..' % elementObject.tag)
-   # print(currentAtrrib.tag)
-   # parent = root.find('.//%s/..' % currentAtrrib.tag)
+  
+    parent = parent_map[parent_map[elementObject]]
+    
+
+
     print(parent.tag)
     while parent.tag != root.find('.//nons:configData', ns).tag:
+        print(parent.attrib)
         if parent.tag == root.find('.//xn:VsDataContainer', ns).tag:
             attribOfparent = parent.find('./xn:attributes/xn:vsDataType', ns)
             arrayOfParent.append(attribOfparent.text.split('vsData')[-1] + "=" + parent.get('id'))
         else:
-            arrayOfParent.append(parent.tag + "=" + parent.get('id'))
-        parent = root.find('.//%s/..' % parent.tag)
-    
-    #arrayOfParent = arrayOfParent[::-1]
+            if parent.tag.split('}')[-1] != elementObject.text.split('vsData')[-1]:
+                arrayOfParent.append(parent.tag.split('}')[-1] + "=" + parent.get('id'))
+       
+        parent = parent_map[parent]
+
+    arrayOfParent = arrayOfParent[::-1]
     return ",".join(arrayOfParent)
 
-a = CreateMO(xmlfile, Type[0])
+a = CreateMO(xmlfile, Type[100])
 print(a)
