@@ -14,6 +14,8 @@ print(type(subroot))
 print(type(classes))
 dateTime = date.get('dateTime').split(':')[0]
 network = '4G'
+MOName = root.find(".//spec:syndata/.[@FunctionType='eNodeBFunction']", ns).get('Id').split('=')[-1]
+
 
 
 def createHeader(classTag):
@@ -50,7 +52,7 @@ def createHeader(classTag):
     return headerArray
 def WriteData(classTag, exportFile):
     for className in classTag:
-        MO = className.tag.split('}')[-1]
+        MO = MOName
         attrib = className.find("./*")
         headerNames = attrib.findall("./*")
         if not headerNames:

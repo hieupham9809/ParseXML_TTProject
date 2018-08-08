@@ -29,12 +29,13 @@ parent_map = dict((c, p) for p in root.getiterator() for c in p)
 #main function
 def WriteToFile():
     for dataTypeName in nameOfObj:
-        print(dataTypeName)
+        #print(dataTypeName)
         arrayOfContent = []
         arrayOfObj = getArray(dataTypeName) #getArray from Type
         for obj in arrayOfObj:
             tempAttrib = parent_map[obj]
             contentOfObj = tempAttrib.find('./es:' + obj.text, ns)
+            print(contentOfObj.tag)
             arrayOfContent.append(contentOfObj)
         
         headerArray = createHeader(arrayOfContent[0]) #array to write as header of file text
@@ -52,7 +53,8 @@ def WriteToFile():
         #print(headerArray)
         for data in dataArray:
             #exportFile.write(''.join(data))
-            print(data)
+            #print(data)
+            pass
         exportFile.close() 
         
         
@@ -91,7 +93,7 @@ def getContentOfObj(content):
    # if not content:
     #    return contentArray.append(" ")
     fileName = xmlfile.split('/')[-1]
-    print(content)
+    #print(content.tag)
     tempAttrib = parent_map[content]
     vsdt = tempAttrib.find('xn:vsDataType', ns)
     MO = CreateMO(vsdt)
