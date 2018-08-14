@@ -76,7 +76,7 @@ def WriteToFile():
         exportFile = open(os.path.abspath(locationOfOutputFile), 'w', encoding='utf-8')
         
         exportFile.write(subNetworkContentToWrite)
-    print("Parse completed!")
+    print("Completed!")
 
 def createHeader(content): #return array of header
     headerArray = []
@@ -88,7 +88,7 @@ def createHeader(content): #return array of header
 
     
     if not headerNames:
-        return headerArray
+        pass
     else:
         for headerName in headerNames:    
             elements = headerName.findall("./*")
@@ -164,7 +164,7 @@ def CreateMO(elementObject):
         parent = parent_map[parent]
 
     arrayOfParent = arrayOfParent[::-1]
-    return ",".join(arrayOfParent)
+    return ",".join(arrayOfParent) + "\t"
 
 #fucntion to handle SubNetwork
 def findSubNetwork():
