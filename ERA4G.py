@@ -83,7 +83,7 @@ def createHeader(content): #return array of header
     headerArray.append("FileName\t")
     headerArray.append("MO\t")
     if not content:
-        return "".join(headerArray)
+        return "".join(headerArray) + "\n"
     headerNames = content.findall("./*")
 
     
@@ -124,7 +124,7 @@ def getContentOfObj(content):
 
     headerNames = content.findall("./*")
     if not headerNames:
-        return "".join(contentArray)
+        pass
     else:
         for headerName in headerNames:    
             elements = headerName.findall("./*")
