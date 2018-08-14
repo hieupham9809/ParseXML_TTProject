@@ -142,7 +142,7 @@ def getContentOfObj(content):
     contentArray.append("\n")
     
     return "".join(contentArray) 
-    #return contentArray
+    
 
 
 
