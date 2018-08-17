@@ -5,7 +5,8 @@ import time
 
 xmlfile='D:/sdataprj/Full/Full/4G/NSN/4G NSN.xml'
 ns = {'ns0': 'raml20.xsd'}
-
+fileIndex = 0
+network = '4G'
 element_tree = ET.iterparse(xmlfile, events=('start', ))
 #test = ET.parse("1.xml")
 #root = test.getroot()
@@ -64,8 +65,78 @@ def writeSplitedXML(fileIndex, contenPerFile, header):
         f.write("</cmData>\n</raml>")
 def ParseFuction(xmlURL):
     root = ET.parse(xmlURL).getroot()
+    #find all MO
+    Type = root.findall(".//ns0:managedObject", ns)
+    typeArray = []     #List of all MO Name
+    for name in Type:
+        typeArray.append(name.get('class'))
+    nameOfObject = list(set(typeArray))
+    #now we have a list name of MO
+
+    #for each name of MO, take all MO which has this name:
     
-splitFunction2()
+    for dataTypeName in nameOfObject:
+        print(dataTypeName)
+        arrayOfContent = []
+        for typeName in Type:
+            if typeName.get('class') == dataTypeName:
+                arrayOfContent.append(typeName)
+        headerArray = createHeader()
+
+        dataArray = []
+        for content in arrayOfContent:
+            dataArray.append(getContentOfObj(content))
+
+        nameOfOutputFile = "export_" + dataTypeName + "__" + dateTime + ".txt"
+        locationOfOutputFile ="NSN/" + network + "/" + dateTime + "/" + nameOfOutputFile
+        if not os.path.exists(os.path.dirname(locationOfOutputFile)):
+            try:
+                os.makedirs(os.path.dirname(locationOfOutputFile))
+            except OSError as exc:
+                if exc.errno != errno.EEXIST:
+                    raise
+            
+        exportFile = open(os.path.abspath(locationOfOutputFile), 'a', encoding='utf-8')
+        headerToWrite = "".join(headerArray)
+        exportFile.write(headerToWrite)
+
+        contentToWrite = "".join(dataArray)
+        #for data in dataArray:
+        #    contentToWrite.append(data + "\n")
+            #print(data)
+        exportFile.write(contentToWrite)
+        exportFile.close()    
+
+
+
+def createHeader(content): #return array of header
+    headerArray = []
+    headerArray.append("FileName\t")
+    headerArray.append("MO\t")
+    if not content:
+        return "".join(headerArray) + "\n"
+    headerNames = content.findall("./*")
+
+    
+    if not headerNames:
+        pass
+    else:
+        for headerName in headerNames:    
+            elements = headerName.findall("./*")
+            if not elements:
+                headerArray.append(headerName.tag.split('}')[-1].rstrip() + "\t")
+            else:
+                currentTagName = headerName.tag.split('}')[-1].rstrip()
+                for element in elements:
+                    columnHeader = currentTagName + "_" + element.tag.split('}')[-1].rstrip()
+                    headerArray.append(columnHeader + "\t")
+    headerArray.append("\n")
+    return headerArray
+
+def getContentOfObj(content):
+    pass
+#splitFunction2()
+ParseFuction("0.xml")
 #print(root.tag)
 #fileName = xmlfile.split('/')[-1]
 #get data time
