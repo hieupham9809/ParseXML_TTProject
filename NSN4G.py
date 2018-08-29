@@ -81,11 +81,15 @@ def ParseFuction(xmlURL):
         for typeName in Type:
             if typeName.get('class') == dataTypeName:
                 arrayOfContent.append(typeName)
-        headerArray = createHeader()
-
+        headerArray = createHeader(arrayOfContent[0])
+        print("".join(headerArray))
+'''
         dataArray = []
         for content in arrayOfContent:
             dataArray.append(getContentOfObj(content))
+
+        if not dataArray:   #if it's complete empty, cross over it
+            continue
 
         nameOfOutputFile = "export_" + dataTypeName + "__" + dateTime + ".txt"
         locationOfOutputFile ="NSN/" + network + "/" + dateTime + "/" + nameOfOutputFile
@@ -106,7 +110,7 @@ def ParseFuction(xmlURL):
             #print(data)
         exportFile.write(contentToWrite)
         exportFile.close()    
-
+'''
 
 
 def createHeader(content): #return array of header
@@ -114,7 +118,8 @@ def createHeader(content): #return array of header
     headerArray.append("FileName\t")
     headerArray.append("MO\t")
     if not content:
-        return "".join(headerArray) + "\n"
+        headerArray.append("\n")
+        return headerArray
     headerNames = content.findall("./*")
 
     
@@ -122,21 +127,69 @@ def createHeader(content): #return array of header
         pass
     else:
         for headerName in headerNames:    
-            elements = headerName.findall("./*")
-            if not elements:
-                headerArray.append(headerName.tag.split('}')[-1].rstrip() + "\t")
-            else:
-                currentTagName = headerName.tag.split('}')[-1].rstrip()
-                for element in elements:
-                    columnHeader = currentTagName + "_" + element.tag.split('}')[-1].rstrip()
-                    headerArray.append(columnHeader + "\t")
+            headerNameTag = headerName.tag
+            if headerNameTag == '{raml20.xsd}p':
+                headerArray.append(headerName.get('name').rstrip() + "\t")
+            elif headerNameTag == '{ram120.xsd}list':
+                currentName = headerName.get('name')
+                listElements = headerName.findall("./*")            ######replace by iterfind
+                if not listElements:
+                    continue
+
+                listElementTags = []                                            # get all tag types
+                for listElement in listElements:
+                    listElementTags.append(listElement.tag)
+                listElementTags = list(set(listElementTags))
+
+                if len(listElementTags) > 1:
+                    for listElement in listElements:
+                        if listElement.tag == '{ram120}p':
+                            headerArray.append(listElement.get('name').rstrip() + "\t")
+                        elif listElement.tag == '{ram120}item':
+                            listSubItems = listElement.findall("./*")
+                            if not listSubItems:
+                                continue
+                            
+                            for listSubItem in listSubItems:
+                                headerArray.append(listSubItem.get('name').rstrip() + "\t")
+                        else: 
+                            print("New tag, need handling")
+                            return
+                else:                                                            # listElements has only p tags or item tags 
+                    if listElements[0].tag == '{ram120}p':                      # all listElements are p tag
+                        if not listElements[0].get('name'):
+                            headerArray.append(currentName.rstrip() + "\t")
+                            continue
+                        else:
+                            for listElement in listElements:
+                                headerArray.append(listElement.get('name').rstrip() + "\t")
+                    elif listElements[0].tag == '{ram120}item':                 # all listElements are item tag
+                        listSubItems = listElements[0].findall("./*")           # subItems of Item
+                        if not listSubItems:                                    # if it's empty, pass this headerName
+                            continue
+                        
+                        if not listSubItems[0].get('name'):                     # check the first subItem
+                            headerArray.append(currentName.rstrip() + "\t")
+                            continue
+                        else:
+                            for listSubItem in listSubItems:
+                                headerArray.append(listSubItem.get('name').rstrip() + "\t")
+
+                    else:
+                        print("New tag, need handling")
+                        return
+
     headerArray.append("\n")
     return headerArray
 
 def getContentOfObj(content):
     pass
+
+#root = ET.parse("0.xml").getroot()
+#cm = root.find("./*")
+
 #splitFunction2()
-ParseFuction("0.xml")
+ParseFuction('C:/Users/MINH HIEU/0/1.xml')
 #print(root.tag)
 #fileName = xmlfile.split('/')[-1]
 #get data time

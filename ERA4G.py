@@ -83,7 +83,8 @@ def createHeader(content): #return array of header
     headerArray.append("FileName\t")
     headerArray.append("MO\t")
     if not content:
-        pass
+        headerArray.append("\n")
+        return headerArray
     headerNames = content.findall("./*")
 
     
